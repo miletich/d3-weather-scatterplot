@@ -6,7 +6,6 @@ type Datum = {
   datetime: Date;
 };
 type Accessor = (d: Datum) => number;
-type DateAccessor = (d: Datum) => Date;
 
 (async () => {
   const parseDate = d3.timeParse('%Y-%d-%m');
@@ -23,6 +22,7 @@ type DateAccessor = (d: Datum) => Date;
     console.error(error);
   }
 
+  // canvas
   const size = d3.min([window.innerWidth * 0.75, window.innerHeight * 0.75])!;
   const containerWidth = size;
   const containerHeight = size;
@@ -44,4 +44,12 @@ type DateAccessor = (d: Datum) => Date;
     .append('g')
     .attr('class', 'bounds')
     .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  // accessors
+  const xAccessor: Accessor = (d) => d.tempmax;
+  const yAccessor: Accessor = (d) => d.tempmin;
+  // data might span multiple years but we are only interested in the time
+  // of the year, not the absolute date, so we're normalizing years in this way
+  const colorScaleYear = 2000;
+  const colorAccessor: Accessor = (d) => d.datetime.setFullYear(colorScaleYear);
 })();
