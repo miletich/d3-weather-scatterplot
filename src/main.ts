@@ -1,23 +1,27 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import { setupCounter } from './counter'
+import * as d3 from 'd3';
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+type Datum = {
+  tempmin: number;
+  tempmax: number;
+  datetime: Date;
+};
+type Accessor = (d: Datum) => number;
+type DateAccessor = (d: Datum) => Date;
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+(async () => {
+  const parseDate = d3.timeParse('%Y-%d-%m');
+  const formatNumber = d3.format('.1f');
+
+  let data: Datum[] = [];
+  try {
+    data = await d3.csv('./data.csv', (d) => ({
+      tempmin: +d.tempmin!,
+      tempmax: +d.tempmax!,
+      datetime: parseDate(d.datetime!)!,
+    }));
+  } catch (error) {
+    console.error(error);
+  }
+
+  console.log(data);
+})();
