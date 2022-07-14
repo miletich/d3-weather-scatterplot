@@ -52,4 +52,28 @@ type Accessor = (d: Datum) => number;
   // of the year, not the absolute date, so we're normalizing years in this way
   const colorScaleYear = 2000;
   const colorAccessor: Accessor = (d) => d.datetime.setFullYear(colorScaleYear);
+
+  // scales
+  const temperaturesExtent = <[number, number]>(
+    d3.extent([...data.map(xAccessor), ...data.map(yAccessor)])!
+  );
+  const xScale = d3
+    .scaleLinear()
+    .domain(temperaturesExtent)
+    .range([0, width])
+    .nice();
+  const yScale = d3
+    .scaleLinear()
+    .domain(temperaturesExtent)
+    .range([height, 0])
+    .nice();
+  const colorScale = d3
+    .scaleSequential()
+    .domain([
+      parseDate(`${colorScaleYear}-1-1`)!,
+      parseDate(`${colorScaleYear}-12-31`)!,
+    ])
+    // otherwise, autumn dates would be gree and spring dates orange
+    // this way we improve the semantics of the colors
+    .interpolator((d) => d3.interpolateRainbow(-d));
 })();
