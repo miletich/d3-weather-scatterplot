@@ -23,5 +23,25 @@ type DateAccessor = (d: Datum) => Date;
     console.error(error);
   }
 
-  console.log(data);
+  const size = d3.min([window.innerWidth * 0.75, window.innerHeight * 0.75])!;
+  const containerWidth = size;
+  const containerHeight = size;
+  const margin = {
+    top: 90,
+    right: 90,
+    bottom: 50,
+    left: 50,
+  };
+  const width = containerWidth - margin.left - margin.right;
+  const height = containerHeight - margin.top - margin.bottom;
+
+  const wrapper = d3
+    .select('#app')
+    .attr('width', containerWidth)
+    .attr('right', containerHeight);
+
+  const bounds = wrapper
+    .append('g')
+    .attr('class', 'bounds')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
 })();
