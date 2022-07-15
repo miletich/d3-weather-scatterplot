@@ -38,13 +38,23 @@ type Accessor = (d: Datum) => number;
 
   const wrapper = d3
     .select('#app')
+    .append('svg')
     .attr('width', containerWidth)
-    .attr('right', containerHeight);
+    .attr('height', containerHeight);
 
   const bounds = wrapper
     .append('g')
     .attr('class', 'bounds')
     .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  bounds
+    .append('rect')
+    .attr('class', 'bounds-background')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('fill', 'white')
+    .attr('width', width)
+    .attr('height', height);
 
   // accessors
   const xAccessor: Accessor = (d) => d.tempmax;
@@ -77,4 +87,32 @@ type Accessor = (d: Datum) => number;
     // otherwise, autumn dates would be gree and spring dates orange
     // this way we improve the semantics of the colors
     .interpolator((d) => d3.interpolateRainbow(-d));
+
+  // axes
+  const generateXAxis = d3.axisBottom(xScale).ticks(4);
+  const generateYAxis = d3.axisLeft(yScale).ticks(4);
+
+  const xAxis = bounds
+    .append('g')
+    .attr('transform', `translate(0, ${height})`)
+    .call(generateXAxis);
+
+  xAxis
+    .append('text')
+    .attr('class', 'x-axis-label')
+    .attr('text-anchor', 'middle')
+    .attr('x', width / 2)
+    .attr('y', 45)
+    .text('Minimum Temperature °C');
+
+  const yAxis = bounds.append('g').call(generateYAxis);
+
+  yAxis
+    .append('text')
+    .attr('class', 'y-axis-label')
+    .attr('text-anchor', 'middle')
+    .attr('transform', 'rotate(-90)')
+    .attr('x', -height / 2)
+    .attr('y', -40)
+    .text('Maximum Temperature °C');
 })();
