@@ -9,6 +9,10 @@ body {
   background: #f8f9fa;
 }
 
+#app {
+  position: relative;
+}
+
 svg text {
   fill: #34495e;
 }

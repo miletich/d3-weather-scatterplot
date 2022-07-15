@@ -11,6 +11,7 @@ type Accessor = (d: Datum) => number;
 (async () => {
   const parseDate = d3.timeParse('%Y-%m-%d');
   const formatNumber = d3.format('.1f');
+  const formatDate = d3.timeFormat('%d %B');
 
   let data: Datum[] = [];
   try {
@@ -55,6 +56,9 @@ type Accessor = (d: Datum) => number;
     .attr('fill', 'white')
     .attr('width', width)
     .attr('height', height);
+
+  const tooltip = d3.select('#tooltip');
+  const hoverGroup = bounds.append('g').attr('id', '#hoverGroup');
 
   // accessors
   const xAccessor: Accessor = (d) => d.tempmin;
@@ -139,7 +143,7 @@ type Accessor = (d: Datum) => number;
   voronoi.xmax = width;
   voronoi.ymax = height;
 
-  bounds
+  const voronoiCells = bounds
     .append('g')
     .selectAll('.voronoi')
     .data(data)
@@ -148,4 +152,37 @@ type Accessor = (d: Datum) => number;
     .attr('class', 'voronoi')
     .attr('d', (_, i) => voronoi.renderCell(i))
     .attr('fill', 'transparent');
+
+  // evt handlers
+  type EvtHandler = (e: MouseEvent, d: Datum) => void;
+
+  const onVoronoiMouseEnter: EvtHandler = (_, d) => {
+    tooltip.style('opacity', 1);
+    hoverGroup.style('opacity', 1);
+
+    const x = `calc(-50% + ${xScale(xAccessor(d)) + margin.left}px)`;
+    const y = `calc(-100% + ${yScale(yAccessor(d)) + margin.top}px)`;
+
+    tooltip.style('transform', `translate(${x},${y})`);
+
+    hoverGroup
+      .append('circle')
+      .attr('class', 'tooltip-dot')
+      .attr('cx', xScale(xAccessor(d)))
+      .attr('cy', yScale(yAccessor(d)))
+      .attr('r', 7);
+
+    tooltip.select('#date').html(formatDate(d.datetime));
+    tooltip.select('#min-temperature').html(formatNumber(yAccessor(d)));
+    tooltip.select('#max-temperature').html(formatNumber(xAccessor(d)));
+  };
+
+  const onVoronoiMouseLeave: EvtHandler = (_, d) => {
+    tooltip.style('opacity', 0);
+    hoverGroup.selectAll('.tooltip-dot').remove();
+  };
+
+  voronoiCells
+    .on('mouseenter', onVoronoiMouseEnter)
+    .on('mouseleave', onVoronoiMouseLeave);
 })();
