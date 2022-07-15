@@ -9,7 +9,7 @@ type Datum = {
 type Accessor = (d: Datum) => number;
 
 (async () => {
-  const parseDate = d3.timeParse('%Y-%d-%m');
+  const parseDate = d3.timeParse('%Y-%m-%d');
   const formatNumber = d3.format('.1f');
 
   let data: Datum[] = [];
@@ -81,7 +81,7 @@ type Accessor = (d: Datum) => number;
   const colorScale = d3
     .scaleSequential()
     .domain([
-      parseDate(`${colorScaleYear}-1-1`)!,
+      parseDate(`${colorScaleYear}-01-01`)!,
       parseDate(`${colorScaleYear}-12-31`)!,
     ])
     // otherwise, autumn dates would be gree and spring dates orange
@@ -126,5 +126,6 @@ type Accessor = (d: Datum) => number;
     .append('circle')
     .attr('cx', (d) => xScale(xAccessor(d)))
     .attr('cy', (d) => yScale(yAccessor(d)))
-    .attr('r', 4);
+    .attr('r', 4)
+    .attr('fill', (d) => colorScale(colorAccessor(d)));
 })();
