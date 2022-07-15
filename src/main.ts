@@ -57,8 +57,8 @@ type Accessor = (d: Datum) => number;
     .attr('height', height);
 
   // accessors
-  const xAccessor: Accessor = (d) => d.tempmax;
-  const yAccessor: Accessor = (d) => d.tempmin;
+  const xAccessor: Accessor = (d) => d.tempmin;
+  const yAccessor: Accessor = (d) => d.tempmax;
   // data might span multiple years but we are only interested in the time
   // of the year, not the absolute date, so we're normalizing years in this way
   const colorScaleYear = 2000;
@@ -115,4 +115,16 @@ type Accessor = (d: Datum) => number;
     .attr('x', -height / 2)
     .attr('y', -40)
     .text('Maximum Temperature °C');
+
+  // scatter plot
+  const scatterPlot = bounds.append('g').attr('class', 'scatter-plot');
+
+  const dots = scatterPlot
+    .selectAll('circle')
+    .data(data)
+    .enter()
+    .append('circle')
+    .attr('cx', (d) => xScale(xAccessor(d)))
+    .attr('cy', (d) => yScale(yAccessor(d)))
+    .attr('r', 4);
 })();
