@@ -7,7 +7,17 @@
     <title>Weather Scatter Plot</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="tooltip" class="tooltip">
+        <div class="tooltip-date">
+          <span id="date"></span>
+        </div>
+        <div class="tooltip-temperature">
+          <span id="min-temperature"></span>&deg;F -
+          <span id="max-temperature"></span>&deg;F
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
