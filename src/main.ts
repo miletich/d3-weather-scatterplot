@@ -128,4 +128,24 @@ type Accessor = (d: Datum) => number;
     .attr('cy', (d) => yScale(yAccessor(d)))
     .attr('r', 4)
     .attr('fill', (d) => colorScale(colorAccessor(d)));
+
+  // voronoi
+  const delaunay = d3.Delaunay.from(
+    data,
+    (d) => xScale(xAccessor(d)),
+    (d) => yScale(yAccessor(d))
+  );
+  const voronoi = delaunay.voronoi();
+  voronoi.xmax = width;
+  voronoi.ymax = height;
+
+  bounds
+    .append('g')
+    .selectAll('.voronoi')
+    .data(data)
+    .enter()
+    .append('path')
+    .attr('class', 'voronoi')
+    .attr('d', (_, i) => voronoi.renderCell(i))
+    .attr('fill', 'transparent');
 })();
