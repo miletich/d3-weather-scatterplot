@@ -77,3 +77,7 @@ svg text {
   font-size: 1.1em;
   line-height: 1.4em;
 }
+
+.histogram-area {
+  fill: #cbd2d7;
+}

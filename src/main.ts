@@ -191,20 +191,31 @@ type Accessor = (d: Datum) => number;
     .attr('class', 'right-histogram-bounds')
     .attr(
       'transform',
-      `translate(${-histogramHeight - histogramMargin}, ${-height})`
+      `translate(${width + histogramMargin + histogramHeight}, 0) rotate(90)`
     );
 
   const generateTopHistogramArea = d3
     .area<Bin<Datum, number>>()
     .x((d) => xScale((d.x0! + d.x1!) / 2))
-    .y0(0)
+    .y0(histogramHeight)
     .y1((d) => topHistogramYScale(d.length))
     .curve(d3.curveBasis);
   const generateRightHistogramArea = d3
     .area<Bin<Datum, number>>()
     .x((d) => yScale((d.x0! + d.x1!) / 2))
-    .y0(0)
-    .y1((d) => rightHistogramYScale(d.length));
+    .y0(histogramHeight)
+    .y1((d) => rightHistogramYScale(d.length))
+    .curve(d3.curveBasis);
+
+  const topHistogram = topHistogramBounds
+    .append('path')
+    .attr('class', 'histogram-area')
+    .attr('d', generateTopHistogramArea(topHistogramBins));
+
+  const rightHistogram = rightHistogramBounds
+    .append('path')
+    .attr('class', 'histogram-area')
+    .attr('d', generateRightHistogramArea(rightHistogramBins));
 
   // evt handlers
   type EvtHandler = (e: MouseEvent, d: Datum) => void;
