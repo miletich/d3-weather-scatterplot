@@ -180,6 +180,19 @@ type Accessor = (d: Datum) => number;
     .domain(<[number, number]>d3.extent(rightHistogramBins, (d) => d.length))
     .range([histogramHeight, 0]);
 
+  const topHistogramBounds = bounds
+    .append('g')
+    .attr('class', 'top-histogram-bounds')
+    .attr('transform', `translate(0, ${-histogramHeight - histogramMargin})`);
+
+  const rightHistogramBounds = bounds
+    .append('g')
+    .attr('class', 'right-histogram-bounds')
+    .attr(
+      'transform',
+      `translate(${-histogramHeight - histogramMargin}, ${-height})`
+    );
+
   // evt handlers
   type EvtHandler = (e: MouseEvent, d: Datum) => void;
 
