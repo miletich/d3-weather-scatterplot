@@ -168,6 +168,18 @@ type Accessor = (d: Datum) => number;
     .value(yAccessor)
     .thresholds(20);
 
+  const topHistogramBins = generateTopHistogram(data);
+  const rightHistogramBins = generateRightHistogram(data);
+
+  const topHistogramYScale = d3
+    .scaleLinear()
+    .domain(<[number, number]>d3.extent(topHistogramBins, (d) => d.length))
+    .range([histogramHeight, 0]);
+  const rightHistogramYScale = d3
+    .scaleLinear()
+    .domain(<[number, number]>d3.extent(rightHistogramBins, (d) => d.length))
+    .range([histogramHeight, 0]);
+
   // evt handlers
   type EvtHandler = (e: MouseEvent, d: Datum) => void;
 
