@@ -1,5 +1,6 @@
 import './style.css';
 import * as d3 from 'd3';
+import { Bin } from 'd3';
 
 type Datum = {
   tempmin: number;
@@ -192,6 +193,18 @@ type Accessor = (d: Datum) => number;
       'transform',
       `translate(${-histogramHeight - histogramMargin}, ${-height})`
     );
+
+  const generateTopHistogramArea = d3
+    .area<Bin<Datum, number>>()
+    .x((d) => xScale((d.x0! + d.x1!) / 2))
+    .y0(0)
+    .y1((d) => topHistogramYScale(d.length))
+    .curve(d3.curveBasis);
+  const generateRightHistogramArea = d3
+    .area<Bin<Datum, number>>()
+    .x((d) => yScale((d.x0! + d.x1!) / 2))
+    .y0(0)
+    .y1((d) => rightHistogramYScale(d.length));
 
   // evt handlers
   type EvtHandler = (e: MouseEvent, d: Datum) => void;
