@@ -155,6 +155,19 @@ type Accessor = (d: Datum) => number;
     .attr('d', (_, i) => voronoi.renderCell(i))
     .attr('fill', 'transparent');
 
+  // histograms
+  const generateTopHistogram = d3
+    .bin<Datum, number>()
+    .domain(<[number, number]>xScale.domain())
+    .value(xAccessor)
+    .thresholds(20);
+
+  const generateRightHistogram = d3
+    .bin<Datum, number>()
+    .domain(<[number, number]>yScale.domain())
+    .value(yAccessor)
+    .thresholds(20);
+
   // evt handlers
   type EvtHandler = (e: MouseEvent, d: Datum) => void;
 
