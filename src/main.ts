@@ -36,6 +36,8 @@ type Accessor = (d: Datum) => number;
   };
   const width = containerWidth - margin.left - margin.right;
   const height = containerHeight - margin.top - margin.bottom;
+  const histogramMargin = 10;
+  const histogramHeight = 70;
 
   const wrapper = d3
     .select('#app')
