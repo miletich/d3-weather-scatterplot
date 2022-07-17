@@ -61,7 +61,6 @@ type Accessor = (d: Datum) => number;
     .attr('height', height);
 
   const tooltip = d3.select('#tooltip');
-  const hoverGroup = bounds.append('g').attr('id', '#hoverGroup');
 
   // accessors
   const xAccessor: Accessor = (d) => d.tempmin;
@@ -217,6 +216,18 @@ type Accessor = (d: Datum) => number;
     .attr('class', 'histogram-area')
     .attr('d', generateRightHistogramArea(rightHistogramBins));
 
+  // hover lines
+  const hoverGroup = bounds.append('g').attr('id', '#hoverGroup');
+  const hoverLineThickness = 10;
+  const horizontalLine = hoverGroup.append('rect').attr('class', 'hover-line');
+  const verticalLine = hoverGroup.append('rect').attr('class', 'hover-line');
+  d3.selectAll('.hover-line')
+    // prevents the lines from capturing hover effects
+    .style('pointer-events', 'none')
+    // smooths the movement of hover lines
+    .style('transition', 'all 0.2s ease-out')
+    .style('mix-blend-mode', 'color-burn');
+
   // evt handlers
   type EvtHandler = (e: MouseEvent, d: Datum) => void;
 
@@ -234,7 +245,22 @@ type Accessor = (d: Datum) => number;
       .attr('class', 'tooltip-dot')
       .attr('cx', xScale(xAccessor(d)))
       .attr('cy', yScale(yAccessor(d)))
-      .attr('r', 7);
+      .attr('r', 7)
+      .style('pointer-events', 'none');
+
+    horizontalLine
+      .attr('x', xScale(xAccessor(d)))
+      .attr('y', yScale(yAccessor(d)) - hoverLineThickness / 2)
+      .attr(
+        'width',
+        width - xScale(xAccessor(d)) + histogramHeight + histogramMargin
+      )
+      .attr('height', hoverLineThickness);
+    verticalLine
+      .attr('x', xScale(xAccessor(d)) - hoverLineThickness / 2)
+      .attr('y', -histogramHeight - histogramMargin)
+      .attr('width', hoverLineThickness)
+      .attr('height', yScale(yAccessor(d)) + histogramHeight + histogramMargin);
 
     tooltip.select('#date').html(formatDate(d.datetime));
     tooltip.select('#min-temperature').html(formatNumber(yAccessor(d)));
@@ -243,6 +269,7 @@ type Accessor = (d: Datum) => number;
 
   const onVoronoiMouseLeave: EvtHandler = (_, d) => {
     tooltip.style('opacity', 0);
+    hoverGroup.style('opacity', 0);
     hoverGroup.selectAll('.tooltip-dot').remove();
   };
 

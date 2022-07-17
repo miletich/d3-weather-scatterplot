@@ -101,9 +101,14 @@ svg text {
 
 .histogram-area {
   fill: #cbd2d7;
+  opacity: 0.5;
 }
 
 .tick line,
 .domain {
   color: #cfd4d8;
+}
+
+.hover-line {
+  fill: #5758bb;
 }
