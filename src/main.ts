@@ -39,6 +39,8 @@ type Accessor = (d: Datum) => number;
   const height = containerHeight - margin.top - margin.bottom;
   const histogramMargin = 10;
   const histogramHeight = 70;
+  const legendWidth = 250;
+  const legendHeight = 26;
 
   const wrapper = d3
     .select('#app')
@@ -50,6 +52,8 @@ type Accessor = (d: Datum) => number;
     .append('g')
     .attr('class', 'bounds')
     .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const defs = wrapper.append('defs');
 
   bounds
     .append('rect')
@@ -155,6 +159,36 @@ type Accessor = (d: Datum) => number;
     .attr('d', (_, i) => voronoi.renderCell(i))
     .attr('fill', 'transparent');
 
+  // legend
+  const legendGroup = bounds
+    .append('g')
+    .attr('class', 'legend-group')
+    .attr(
+      'transform',
+      `translate(${width - legendWidth - 9}, ${height - legendHeight - 9})`
+    );
+
+  const numberOfGradientStops = 10;
+  const stops = d3
+    .range(numberOfGradientStops)
+    .map((i) => i / (numberOfGradientStops - 1));
+
+  const legendGradientId = 'legend-gradient';
+  const gradient = defs
+    .append('linearGradient')
+    .attr('id', legendGradientId)
+    .selectAll('stop')
+    .data(stops)
+    .enter()
+    .append('stop')
+    .attr('offset', (d) => `${d * 100}%`)
+    .attr('stop-color', (d) => d3.interpolateRainbow(-d));
+
+  const legendGradient = legendGroup
+    .append('rect')
+    .attr('width', legendWidth)
+    .attr('height', legendHeight)
+    .attr('fill', `url(#${legendGradientId})`);
   // histograms
   const generateTopHistogram = d3
     .bin<Datum, number>()
