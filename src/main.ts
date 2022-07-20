@@ -239,89 +239,6 @@ type Accessor = (d: Datum) => number;
     .attr('x', legendWidth / 2)
     .attr('y', -6);
 
-  type LegendEvtHandler = (e: MouseEvent) => void;
-  const onLegendMouseMove: LegendEvtHandler = (e) => {
-    const [x] = d3.pointer(e);
-
-    const minDateToHighlight = new Date(
-      legendTickScale.invert(x - legendHighlightBarWidth / 2)
-    );
-    const maxDateToHighlight = new Date(
-      legendTickScale.invert(x + legendHighlightBarWidth / 2)
-    );
-
-    // makes sure x remains within the bounds of the legend
-    const barX = d3.median([
-      // if less than 0, it returns 0
-      0,
-      x - legendHighlightBarWidth / 2,
-      // if more than this, it returns this
-      legendWidth - legendHighlightBarWidth,
-    ])!;
-
-    legendHighlightGroup.style('opacity', 1);
-    legendValueTicks.attr('opacity', 0);
-    legendValues.attr('opacity', 0);
-
-    legendHighlightBar.attr('x', barX);
-
-    const formatLegendDate = d3.timeFormat('%d %b');
-    legendHighlightText.text(
-      [
-        formatLegendDate(minDateToHighlight),
-        formatLegendDate(maxDateToHighlight),
-      ].join(' - ')
-    );
-
-    // dots animation
-    dots.transition().duration(100).style('opacity', 0.08).attr('r', 2);
-
-    type CheckIfWithinRange = (
-      d: Datum,
-      minDate: Date,
-      maxDate: Date
-    ) => boolean;
-    const checkIfWithinRange: CheckIfWithinRange = (d, minDate, maxDate) => {
-      const minYear = minDate.getFullYear();
-      const maxYear = maxDate.getFullYear();
-
-      if (minYear < colorScaleYear) {
-        return d.datetime.setFullYear(colorScaleYear) <= maxDate.getTime();
-      }
-
-      if (maxYear > colorScaleYear) {
-        return d.datetime.setFullYear(colorScaleYear) >= minDate.getTime();
-      }
-
-      return d.datetime <= maxDate && d.datetime >= minDate;
-    };
-
-    dots
-      .filter((d) =>
-        checkIfWithinRange(d, minDateToHighlight, maxDateToHighlight)
-      )
-      .transition()
-      .duration(100)
-      .style('opacity', 1)
-      .attr('r', 4);
-
-    // histogram
-    const hoverTopHistogram = topHistogramBounds.append('path');
-    const hoverRightHistogram = rightHistogram.append('path');
-  };
-
-  const onLegendMouseLeave: LegendEvtHandler = (e) => {
-    legendHighlightGroup.style('opacity', 0);
-    legendValueTicks.attr('opacity', 1);
-    legendValues.attr('opacity', 1);
-
-    dots.transition().duration(100).style('opacity', 1).attr('r', 4);
-  };
-
-  legendGradient
-    .on('mousemove', onLegendMouseMove)
-    .on('mouseleave', onLegendMouseLeave);
-
   // histograms
   const generateTopHistogram = d3
     .bin<Datum, number>()
@@ -382,6 +299,113 @@ type Accessor = (d: Datum) => number;
     .append('path')
     .attr('class', 'histogram-area')
     .attr('d', generateRightHistogramArea(rightHistogramBins));
+
+  const hoverTopHistogram = topHistogramBounds.append('path');
+  const hoverRightHistogram = rightHistogramBounds.append('path');
+
+  type LegendEvtHandler = (e: MouseEvent) => void;
+  const onLegendMouseMove: LegendEvtHandler = (e) => {
+    const [x] = d3.pointer(e);
+
+    const minDateToHighlight = new Date(
+      legendTickScale.invert(x - legendHighlightBarWidth / 2)
+    );
+    const maxDateToHighlight = new Date(
+      legendTickScale.invert(x + legendHighlightBarWidth / 2)
+    );
+
+    // makes sure x remains within the bounds of the legend
+    const barX = d3.median([
+      // if less than 0, it returns 0
+      0,
+      x - legendHighlightBarWidth / 2,
+      // if more than this, it returns this
+      legendWidth - legendHighlightBarWidth,
+    ])!;
+
+    legendHighlightGroup.style('opacity', 1);
+    legendValueTicks.attr('opacity', 0);
+    legendValues.attr('opacity', 0);
+
+    legendHighlightBar.attr('x', barX);
+
+    const formatLegendDate = d3.timeFormat('%d %b');
+    legendHighlightText.text(
+      [
+        formatLegendDate(minDateToHighlight),
+        formatLegendDate(maxDateToHighlight),
+      ].join(' - ')
+    );
+
+    // dots animation
+    dots.transition().duration(100).style('opacity', 0.08).attr('r', 2);
+
+    type CheckIfWithinRange = (
+      d: Datum,
+      minDate: Date,
+      maxDate: Date
+    ) => boolean;
+    const checkIfWithinRange: CheckIfWithinRange = (d, minDate, maxDate) => {
+      const minYear = minDate.getFullYear();
+      const maxYear = maxDate.getFullYear();
+
+      if (minYear < colorScaleYear) {
+        return (
+          d.datetime <= maxDate ||
+          d.datetime.getTime() >= new Date(minDate).setFullYear(colorScaleYear)
+        );
+      } else if (maxYear > colorScaleYear) {
+        return (
+          d.datetime >= minDate ||
+          d.datetime.getTime() <= new Date(maxDate).setFullYear(colorScaleYear)
+        );
+      } else {
+        return d.datetime <= maxDate && d.datetime >= minDate;
+      }
+    };
+
+    dots
+      .filter((d) =>
+        checkIfWithinRange(d, minDateToHighlight, maxDateToHighlight)
+      )
+      .transition()
+      .duration(100)
+      .style('opacity', 1)
+      .attr('r', 4);
+
+    // histogram
+    // @ts-ignore
+    const hoveredDate = d3.isoParse(legendTickScale.invert(x))!;
+    const hoveredDates = data.filter((d) =>
+      checkIfWithinRange(d, minDateToHighlight, maxDateToHighlight)
+    );
+
+    hoverTopHistogram
+      .attr('opacity', 1)
+      .attr('d', generateTopHistogramArea(generateTopHistogram(hoveredDates)))
+      .attr('fill', colorScale(hoveredDate));
+    hoverRightHistogram
+      .attr('opacity', 1)
+      .attr(
+        'd',
+        generateRightHistogramArea(generateRightHistogram(hoveredDates))
+      )
+      .attr('fill', colorScale(hoveredDate));
+  };
+
+  const onLegendMouseLeave: LegendEvtHandler = (e) => {
+    legendHighlightGroup.style('opacity', 0);
+    legendValueTicks.attr('opacity', 1);
+    legendValues.attr('opacity', 1);
+    hoverTopHistogram.attr('opacity', 0);
+    hoverRightHistogram.attr('opacity', 0);
+
+    dots.transition().duration(100).style('opacity', 1).attr('r', 4);
+  };
+
+  legendGradient
+    .on('mousemove', onLegendMouseMove)
+    .on('mouseleave', onLegendMouseLeave);
 
   // hover lines
   const hoverGroup = bounds.append('g').attr('id', '#hoverGroup');
