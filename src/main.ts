@@ -229,11 +229,13 @@ type Accessor = (d: Datum) => number;
     .append('rect')
     .attr('class', 'legend-highlight-bar')
     .attr('width', legendHighlightBarWidth)
-    .attr('height', legendHeight);
+    .attr('height', legendHeight)
+    .style('pointer-events', 'none');
 
-  const legendHighlightText = legendGroup
+  const legendHighlightText = legendHighlightGroup
     .append('text')
     .attr('class', 'legend-highligh-text')
+    .attr('text-anchor', 'middle')
     .attr('x', legendWidth / 2)
     .attr('y', -6);
 
@@ -241,11 +243,11 @@ type Accessor = (d: Datum) => number;
   const onLegendMouseMove: LegendEvtHandler = (e) => {
     const [x] = d3.pointer(e);
 
-    const minDateToHighlight = legendTickScale.invert(
-      x - legendHighlightBarWidth / 2
+    const minDateToHighlight = new Date(
+      legendTickScale.invert(x - legendHighlightBarWidth / 2)
     );
-    const maxDateToHighlight = legendTickScale.invert(
-      x + legendHighlightBarWidth / 2
+    const maxDateToHighlight = new Date(
+      legendTickScale.invert(x + legendHighlightBarWidth / 2)
     );
 
     // makes sure x remains within the bounds of the legend
@@ -255,11 +257,27 @@ type Accessor = (d: Datum) => number;
       x - legendHighlightBarWidth / 2,
       // if more than this, it returns this
       legendWidth - legendHighlightBarWidth,
-    ]);
+    ])!;
+
+    legendHighlightGroup.style('opacity', 1);
+    legendValueTicks.attr('opacity', 0);
+    legendValues.attr('opacity', 0);
+
+    legendHighlightBar.attr('x', barX);
+
+    const formatLegendDate = d3.timeFormat('%d %b');
+    legendHighlightText.text(
+      [
+        formatLegendDate(minDateToHighlight),
+        formatLegendDate(maxDateToHighlight),
+      ].join(' - ')
+    );
   };
 
   const onLegendMouseLeave: LegendEvtHandler = (e) => {
-    //
+    legendHighlightGroup.style('opacity', 0);
+    legendValueTicks.attr('opacity', 1);
+    legendValues.attr('opacity', 1);
   };
 
   legendGradient

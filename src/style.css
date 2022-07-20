@@ -120,3 +120,13 @@ svg text {
 .legend-tick {
   stroke: #34495e;
 }
+
+.legend-highlight-bar {
+  fill: rgba(255, 255, 255, 0.3);
+  stroke: white;
+  stroke-width: 2px;
+}
+.legend-highlight-text {
+  font-size: 0.8em;
+  font-feature-settings: 'tnum' 1;
+}
