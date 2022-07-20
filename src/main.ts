@@ -272,12 +272,46 @@ type Accessor = (d: Datum) => number;
         formatLegendDate(maxDateToHighlight),
       ].join(' - ')
     );
+
+    // dots animation
+    dots.transition().duration(100).style('opacity', 0.08).attr('r', 2);
+
+    type CheckIfWithinRange = (
+      d: Datum,
+      minDate: Date,
+      maxDate: Date
+    ) => boolean;
+    const checkIfWithinRange: CheckIfWithinRange = (d, minDate, maxDate) => {
+      const minYear = minDate.getFullYear();
+      const maxYear = maxDate.getFullYear();
+
+      if (minYear < colorScaleYear) {
+        return d.datetime.setFullYear(colorScaleYear) <= maxDate.getTime();
+      }
+
+      if (maxYear > colorScaleYear) {
+        return d.datetime.setFullYear(colorScaleYear) >= minDate.getTime();
+      }
+
+      return d.datetime <= maxDate && d.datetime >= minDate;
+    };
+
+    dots
+      .filter((d) =>
+        checkIfWithinRange(d, minDateToHighlight, maxDateToHighlight)
+      )
+      .transition()
+      .duration(100)
+      .style('opacity', 1)
+      .attr('r', 4);
   };
 
   const onLegendMouseLeave: LegendEvtHandler = (e) => {
     legendHighlightGroup.style('opacity', 0);
     legendValueTicks.attr('opacity', 1);
     legendValues.attr('opacity', 1);
+
+    dots.transition().duration(100).style('opacity', 1).attr('r', 4);
   };
 
   legendGradient
