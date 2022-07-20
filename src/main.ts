@@ -383,6 +383,7 @@ type Accessor = (d: Datum) => number;
     hoverTopHistogram
       .attr('opacity', 1)
       .attr('d', generateTopHistogramArea(generateTopHistogram(hoveredDates)))
+      .attr('stroke', 'white')
       .attr('fill', colorScale(hoveredDate));
     hoverRightHistogram
       .attr('opacity', 1)
@@ -390,6 +391,7 @@ type Accessor = (d: Datum) => number;
         'd',
         generateRightHistogramArea(generateRightHistogram(hoveredDates))
       )
+      .attr('stroke', 'white')
       .attr('fill', colorScale(hoveredDate));
   };
 
