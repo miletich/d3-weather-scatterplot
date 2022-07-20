@@ -221,6 +221,20 @@ type Accessor = (d: Datum) => number;
     .attr('x2', legendTickScale)
     .attr('y2', 6);
 
+  // legend interactions
+  type LegendEvtHandler = (e: MouseEvent) => void;
+  const onLegendMouseMove: LegendEvtHandler = (e) => {
+    //
+  };
+
+  const onLegendMouseLeave: LegendEvtHandler = (e) => {
+    //
+  };
+
+  legendGradient
+    .on('mousemove', onLegendMouseMove)
+    .on('mouseleave', onLegendMouseLeave);
+
   // histograms
   const generateTopHistogram = d3
     .bin<Datum, number>()
