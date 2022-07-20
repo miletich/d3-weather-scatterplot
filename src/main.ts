@@ -239,7 +239,23 @@ type Accessor = (d: Datum) => number;
 
   type LegendEvtHandler = (e: MouseEvent) => void;
   const onLegendMouseMove: LegendEvtHandler = (e) => {
-    //
+    const [x] = d3.pointer(e);
+
+    const minDateToHighlight = legendTickScale.invert(
+      x - legendHighlightBarWidth / 2
+    );
+    const maxDateToHighlight = legendTickScale.invert(
+      x + legendHighlightBarWidth / 2
+    );
+
+    // makes sure x remains within the bounds of the legend
+    const barX = d3.median([
+      // if less than 0, it returns 0
+      0,
+      x - legendHighlightBarWidth / 2,
+      // if more than this, it returns this
+      legendWidth - legendHighlightBarWidth,
+    ]);
   };
 
   const onLegendMouseLeave: LegendEvtHandler = (e) => {
