@@ -189,6 +189,38 @@ type Accessor = (d: Datum) => number;
     .attr('width', legendWidth)
     .attr('height', legendHeight)
     .attr('fill', `url(#${legendGradientId})`);
+
+  const ticks = [
+    parseDate(`${colorScaleYear}-4-1`)!,
+    parseDate(`${colorScaleYear}-7-1`)!,
+    parseDate(`${colorScaleYear}-10-1`)!,
+  ];
+
+  const legendTickScale = d3
+    .scaleLinear()
+    .domain(colorScale.domain())
+    .range([0, legendWidth]);
+
+  const legendValues = legendGroup
+    .selectAll('.legend-value')
+    .data(ticks)
+    .enter()
+    .append('text')
+    .attr('class', 'legend-value')
+    .attr('x', legendTickScale)
+    .attr('y', -6)
+    .text((d) => d3.timeFormat('%b')(d));
+
+  const legendValueTicks = legendGroup
+    .selectAll('.legend-tick')
+    .data(ticks)
+    .enter()
+    .append('line')
+    .attr('class', 'legend-tick')
+    .attr('x1', legendTickScale)
+    .attr('x2', legendTickScale)
+    .attr('y2', 6);
+
   // histograms
   const generateTopHistogram = d3
     .bin<Datum, number>()

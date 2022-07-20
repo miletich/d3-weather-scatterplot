@@ -112,3 +112,11 @@ svg text {
 .hover-line {
   fill: #5758bb;
 }
+
+.legend-value {
+  font-size: 0.76em;
+  text-anchor: middle;
+}
+.legend-tick {
+  stroke: #34495e;
+}
