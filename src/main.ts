@@ -304,6 +304,10 @@ type Accessor = (d: Datum) => number;
       .duration(100)
       .style('opacity', 1)
       .attr('r', 4);
+
+    // histogram
+    const hoverTopHistogram = topHistogramBounds.append('path');
+    const hoverRightHistogram = rightHistogram.append('path');
   };
 
   const onLegendMouseLeave: LegendEvtHandler = (e) => {
