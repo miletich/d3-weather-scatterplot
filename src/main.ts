@@ -222,6 +222,21 @@ type Accessor = (d: Datum) => number;
     .attr('y2', 6);
 
   // legend interactions
+  const legendHighlightBarWidth = legendWidth * 0.05;
+  const legendHighlightGroup = legendGroup.append('g').attr('opacity', 0);
+
+  const legendHighlightBar = legendHighlightGroup
+    .append('rect')
+    .attr('class', 'legend-highlight-bar')
+    .attr('width', legendHighlightBarWidth)
+    .attr('height', legendHeight);
+
+  const legendHighlightText = legendGroup
+    .append('text')
+    .attr('class', 'legend-highligh-text')
+    .attr('x', legendWidth / 2)
+    .attr('y', -6);
+
   type LegendEvtHandler = (e: MouseEvent) => void;
   const onLegendMouseMove: LegendEvtHandler = (e) => {
     //
